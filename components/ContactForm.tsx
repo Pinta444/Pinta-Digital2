@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { contact, packets, site, type PacketId } from "@/content/site";
 import { RevealItem } from "./Motion";
 import { PACKET_EVENT } from "./PacketButton";
 
 type Status = { state: "idle" | "sending" | "success" | "error"; message: string };
-type Errors = { name?: string; email?: string };
+type Errors = { name?: string; email?: string; captcha?: string };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -14,6 +15,8 @@ export default function ContactForm() {
   const [packet, setPacket] = useState<PacketId>("growth");
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<Status>({ state: "idle", message: "" });
+  const [token, setToken] = useState("");
+  const captcha = useRef<HCaptcha>(null);
 
   useEffect(() => {
     const onSelect = (e: Event) => setPacket((e as CustomEvent<PacketId>).detail);
@@ -31,10 +34,11 @@ export default function ContactForm() {
     const next: Errors = {};
     if (!name) next.name = "Please add your name.";
     if (!EMAIL_RE.test(email)) next.email = "Please enter a valid email address.";
+    if (!token) next.captcha = "Please tick the box to show you're not a robot.";
     setErrors(next);
-    if (next.name || next.email) {
+    if (next.name || next.email || next.captcha) {
       setStatus({ state: "error", message: "Please fix the highlighted fields." });
-      form.querySelector<HTMLInputElement>(next.name ? "#f-name" : "#f-email")?.focus();
+      if (next.name || next.email) form.querySelector<HTMLInputElement>(next.name ? "#f-name" : "#f-email")?.focus();
       return;
     }
 
@@ -62,6 +66,7 @@ export default function ContactForm() {
           packet: `${chosen.name} (${chosen.formPrice})`,
           message: String(data.get("message") ?? "").trim(),
           botcheck: data.get("botcheck") ? true : "",
+          "h-captcha-response": token,
         }),
       });
       const json = (await res.json().catch(() => ({}))) as { success?: boolean; message?: string };
@@ -78,6 +83,9 @@ export default function ContactForm() {
         message: `That didn't go through. Please try again, or email us at ${site.email}.`,
       });
     }
+    // A captcha token works once, so every attempt needs a fresh check.
+    captcha.current?.resetCaptcha();
+    setToken("");
   }
 
   const sending = status.state === "sending";
@@ -154,6 +162,20 @@ export default function ContactForm() {
           Leave this empty
           <input type="checkbox" name="botcheck" tabIndex={-1} autoComplete="off" />
         </label>
+        <div className="field captcha">
+          <HCaptcha
+            ref={captcha}
+            sitekey={site.hcaptchaSiteKey}
+            theme="dark"
+            reCaptchaCompat={false}
+            onVerify={(t) => {
+              setToken(t);
+              setErrors((e) => ({ ...e, captcha: undefined }));
+            }}
+            onExpire={() => setToken("")}
+          />
+          {errors.captcha && <span className="err">{errors.captcha}</span>}
+        </div>
         <div className="form-foot">
           <p>{contact.privacyNote}</p>
           <button className="btn btn-light" type="submit" disabled={sending}>

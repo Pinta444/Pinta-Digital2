@@ -39,12 +39,16 @@ export default function Privacy() {
 
         <h2>Who processes it</h2>
         <p>
-          The form is delivered by Web3Forms, which forwards your message to our inbox. We don&apos;t sell or share your details with
-          anyone else.
+          The form is delivered by Web3Forms, which forwards your message to our inbox. To keep out spam, the form uses hCaptcha to
+          check that a person is sending it; hCaptcha&apos;s own privacy policy covers that check. We don&apos;t sell or share your
+          details with anyone else.
         </p>
 
         <h2>Cookies and tracking</h2>
-        <p>This website sets no cookies and runs no analytics or advertising trackers.</p>
+        <p>
+          This website sets no cookies of its own and runs no analytics or advertising trackers. The hCaptcha check on the contact form
+          is the only third-party service that loads.
+        </p>
 
         <h2>How long we keep it</h2>
         <p>We keep enquiry emails for as long as needed to answer them and follow up, then delete them.</p>

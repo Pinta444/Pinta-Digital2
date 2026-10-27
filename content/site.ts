@@ -13,7 +13,9 @@ export const site = {
   linkedin: "",
   // Web3Forms access key. Public by design, so it is safe to commit.
   // Create one at https://web3forms.com with the inbox that should receive enquiries.
-  web3formsAccessKey: process.env.NEXT_PUBLIC_WEB3FORMS_KEY ?? "",
+  web3formsAccessKey: process.env.NEXT_PUBLIC_WEB3FORMS_KEY ?? "59e07ea7-7b89-4db2-bb72-49d92f0e98da",
+  // Web3Forms' shared hCaptcha site key for free plans. Turn on hCaptcha for the form in the Web3Forms dashboard too.
+  hcaptchaSiteKey: "50b2fe65-b00b-4b9e-ad62-3ba471098be2",
 };
 
 export const nav = [

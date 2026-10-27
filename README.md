@@ -17,6 +17,8 @@ The form sends submissions to an email inbox through [Web3Forms](https://web3for
 
 The key is public by design, so committing it is fine. Until a key is set, the form tells visitors to email `site.email` instead of pretending to send.
 
+Spam protection uses hCaptcha through Web3Forms' free shared site key (`hcaptchaSiteKey` in `content/site.ts`), plus a hidden honeypot field. In the Web3Forms dashboard, open the form's settings and turn on hCaptcha so submissions without a solved check are rejected. Google reCAPTCHA is a paid Web3Forms Pro feature.
+
 ## Local development
 
 ```bash

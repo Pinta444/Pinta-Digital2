@@ -798,6 +798,17 @@ p {
   font-size: 13px;
   color: #f3b3a2;
 }
+/* hCaptcha draws a fixed 303 × 78 iframe; scale it down where the form is narrower */
+.captcha {
+  min-height: 78px;
+}
+@media (max-width: 390px) {
+  .captcha > div:first-child {
+    transform: scale(0.88);
+    transform-origin: left top;
+    margin-bottom: -9px;
+  }
+}
 .field textarea {
   min-height: 92px;
   resize: vertical;
