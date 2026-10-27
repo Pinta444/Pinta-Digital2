@@ -7,19 +7,22 @@ import { RevealItem } from "./Motion";
 import { PACKET_EVENT } from "./PacketButton";
 
 type Status = { state: "idle" | "sending" | "success" | "error"; message: string };
-type Errors = { name?: string; email?: string; captcha?: string };
+type Errors = { name?: string; email?: string; packet?: string; message?: string; captcha?: string };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function ContactForm() {
-  const [packet, setPacket] = useState<PacketId>("growth");
+  const [packet, setPacket] = useState<PacketId | null>(null);
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<Status>({ state: "idle", message: "" });
   const [token, setToken] = useState("");
   const captcha = useRef<HCaptcha>(null);
 
   useEffect(() => {
-    const onSelect = (e: Event) => setPacket((e as CustomEvent<PacketId>).detail);
+    const onSelect = (e: Event) => {
+      setPacket((e as CustomEvent<PacketId>).detail);
+      setErrors((prev) => ({ ...prev, packet: undefined }));
+    };
     window.addEventListener(PACKET_EVENT, onSelect);
     return () => window.removeEventListener(PACKET_EVENT, onSelect);
   }, []);
@@ -30,15 +33,19 @@ export default function ContactForm() {
     const data = new FormData(form);
     const name = String(data.get("name") ?? "").trim();
     const email = String(data.get("email") ?? "").trim();
+    const message = String(data.get("message") ?? "").trim();
 
     const next: Errors = {};
     if (!name) next.name = "Please add your name.";
     if (!EMAIL_RE.test(email)) next.email = "Please enter a valid email address.";
+    if (!packet) next.packet = "Please choose a packet.";
+    if (!message) next.message = "Please tell us what you'd like to improve.";
     if (!token) next.captcha = "Please tick the box to show you're not a robot.";
     setErrors(next);
-    if (next.name || next.email || next.captcha) {
+    if (Object.values(next).some(Boolean)) {
       setStatus({ state: "error", message: "Please fix the highlighted fields." });
-      if (next.name || next.email) form.querySelector<HTMLInputElement>(next.name ? "#f-name" : "#f-email")?.focus();
+      const first = next.name ? "#f-name" : next.email ? "#f-email" : next.packet ? "#p-start" : next.message ? "#f-msg" : null;
+      if (first) form.querySelector<HTMLElement>(first)?.focus();
       return;
     }
 
@@ -64,7 +71,7 @@ export default function ContactForm() {
           email,
           website: String(data.get("website") ?? "").trim(),
           packet: `${chosen.name} (${chosen.formPrice})`,
-          message: String(data.get("message") ?? "").trim(),
+          message,
           botcheck: data.get("botcheck") ? true : "",
           "h-captcha-response": token,
         }),
@@ -72,7 +79,7 @@ export default function ContactForm() {
       const json = (await res.json().catch(() => ({}))) as { success?: boolean; message?: string };
       if (!res.ok || !json.success) throw new Error(json.message || `HTTP ${res.status}`);
       form.reset();
-      setPacket(packet);
+      setPacket(null);
       setStatus({
         state: "success",
         message: `Thanks, ${name.split(" ")[0]}. We'll reply within one working day.`,
@@ -101,6 +108,7 @@ export default function ContactForm() {
               id="f-name"
               name="name"
               autoComplete="name"
+              required
               aria-invalid={!!errors.name}
               aria-describedby={errors.name ? "f-name-err" : undefined}
             />
@@ -117,6 +125,7 @@ export default function ContactForm() {
               id="f-email"
               name="email"
               autoComplete="email"
+              required
               aria-invalid={!!errors.email}
               aria-describedby={errors.email ? "f-email-err" : undefined}
             />
@@ -133,9 +142,9 @@ export default function ContactForm() {
           </label>
           <input type="url" id="f-site" name="website" placeholder="https://" autoComplete="url" />
         </div>
-        <fieldset className="field">
+        <fieldset className="field" aria-describedby={errors.packet ? "f-packet-err" : undefined}>
           <legend>Packet</legend>
-          <div className="choice">
+          <div className={`choice${errors.packet ? " invalid" : ""}`}>
             {packets.items.map((p) => (
               <label key={p.id}>
                 <input
@@ -143,20 +152,39 @@ export default function ContactForm() {
                   id={`p-${p.id}`}
                   name="packet"
                   value={p.id}
+                  required
                   checked={packet === p.id}
-                  onChange={() => setPacket(p.id)}
+                  onChange={() => {
+                    setPacket(p.id);
+                    setErrors((e) => ({ ...e, packet: undefined }));
+                  }}
                 />
                 {p.name}
                 <span>{p.formPrice}</span>
               </label>
             ))}
           </div>
+          {errors.packet && (
+            <span className="err" id="f-packet-err">
+              {errors.packet}
+            </span>
+          )}
         </fieldset>
         <div className="field">
-          <label htmlFor="f-msg">
-            What would you like to improve? <small>(optional)</small>
-          </label>
-          <textarea id="f-msg" name="message" placeholder="For example: we get traffic but very few quote requests." />
+          <label htmlFor="f-msg">What would you like to improve?</label>
+          <textarea
+            id="f-msg"
+            name="message"
+            required
+            placeholder="For example: we get traffic but very few quote requests."
+            aria-invalid={!!errors.message}
+            aria-describedby={errors.message ? "f-msg-err" : undefined}
+          />
+          {errors.message && (
+            <span className="err" id="f-msg-err">
+              {errors.message}
+            </span>
+          )}
         </div>
         <label className="trap" aria-hidden="true">
           Leave this empty

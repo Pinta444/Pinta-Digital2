@@ -798,6 +798,9 @@ p {
   font-size: 13px;
   color: #f3b3a2;
 }
+.choice.invalid label {
+  border-color: #f0a08a;
+}
 /* hCaptcha draws a fixed 303 × 78 iframe; scale it down where the form is narrower */
 .captcha {
   min-height: 78px;
