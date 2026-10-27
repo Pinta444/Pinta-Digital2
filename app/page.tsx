@@ -1,3 +1,4 @@
+import BackToTop from "@/components/BackToTop";
 import ContactForm from "@/components/ContactForm";
 import DriftBackground from "@/components/DriftBackground";
 import Footer from "@/components/Footer";
@@ -199,6 +200,7 @@ export default function Home() {
         </main>
         <Footer />
       </div>
+      <BackToTop />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
     </>
   );

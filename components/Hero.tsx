@@ -1,6 +1,5 @@
 import { Fragment, type CSSProperties } from "react";
 import { hero } from "@/content/site";
-import { Magnetic } from "./Motion";
 
 // The hero animates with CSS so it plays before (and without) JavaScript.
 const delay = (s: number) => ({ "--d": `${s}s` }) as CSSProperties;
@@ -35,11 +34,9 @@ export default function Hero() {
             {hero.lede}
           </p>
           <div {...fade(2)} className="ctas rise">
-            <Magnetic>
-              <a className="btn btn-light" href={hero.primaryCta.href}>
-                {hero.primaryCta.label}
-              </a>
-            </Magnetic>
+            <a className="btn btn-light" href={hero.primaryCta.href}>
+              {hero.primaryCta.label}
+            </a>
             <a className="btn btn-line" href={hero.secondaryCta.href}>
               {hero.secondaryCta.label}
             </a>

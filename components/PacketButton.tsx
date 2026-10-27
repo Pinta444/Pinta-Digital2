@@ -1,12 +1,11 @@
 "use client";
 
 import type { PacketId } from "@/content/site";
-import { Magnetic } from "./Motion";
 
 export const PACKET_EVENT = "pinta:select-packet";
 
 export default function PacketButton({ id, label, primary }: { id: PacketId; label: string; primary: boolean }) {
-  const link = (
+  return (
     <a
       className={`btn ${primary ? "btn-light" : "btn-line"}`}
       href="#contact"
@@ -15,5 +14,4 @@ export default function PacketButton({ id, label, primary }: { id: PacketId; lab
       {label}
     </a>
   );
-  return primary ? <Magnetic>{link}</Magnetic> : link;
 }

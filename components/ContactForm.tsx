@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { contact, packets, site, type PacketId } from "@/content/site";
-import { Magnetic, RevealItem } from "./Motion";
+import { RevealItem } from "./Motion";
 import { PACKET_EVENT } from "./PacketButton";
 
 type Status = { state: "idle" | "sending" | "success" | "error"; message: string };
@@ -156,11 +156,9 @@ export default function ContactForm() {
         </label>
         <div className="form-foot">
           <p>{contact.privacyNote}</p>
-          <Magnetic>
-            <button className="btn btn-light" type="submit" disabled={sending}>
-              {sending ? "Sending…" : "Send request"}
-            </button>
-          </Magnetic>
+          <button className="btn btn-light" type="submit" disabled={sending}>
+            {sending ? "Sending…" : "Send request"}
+          </button>
         </div>
         <p className={`status ${status.state}`} role="status" aria-live="polite">
           {status.message}

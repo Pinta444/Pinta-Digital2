@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { nav, site } from "@/content/site";
 import { BrandMark } from "./Brand";
-import { Magnetic } from "./Motion";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -41,11 +40,9 @@ export default function Header() {
               ))}
           </nav>
           <div className="head-actions">
-            <Magnetic>
-              <a className="btn btn-light" href="#contact">
-                Book a call
-              </a>
-            </Magnetic>
+            <a className="btn btn-light" href="#contact">
+              Book a call
+            </a>
             <button
               className="menu-btn"
               type="button"

@@ -5,9 +5,7 @@ import {
   motion,
   MotionConfig,
   useInView,
-  useMotionValue,
   useReducedMotion,
-  useSpring,
   type Variants,
 } from "motion/react";
 import { useEffect, useRef, type ReactNode } from "react";
@@ -76,35 +74,6 @@ export function RevealItem({ as = "div", hover, children, ...rest }: ItemProps) 
     <Tag variants={item} whileHover={hover ? lift : undefined} {...rest}>
       {children}
     </Tag>
-  );
-}
-
-/** Pulls its child gently toward the cursor on devices with a fine pointer. */
-export function Magnetic({ children }: { children: ReactNode }) {
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const sx = useSpring(x, { stiffness: 260, damping: 18 });
-  const sy = useSpring(y, { stiffness: 260, damping: 18 });
-  const ref = useRef<HTMLSpanElement>(null);
-
-  return (
-    <motion.span
-      ref={ref}
-      className="magnet"
-      style={{ x: sx, y: sy }}
-      onPointerMove={(e) => {
-        if (e.pointerType !== "mouse" || !ref.current) return;
-        const r = ref.current.getBoundingClientRect();
-        x.set((e.clientX - r.left - r.width / 2) * 0.25);
-        y.set((e.clientY - r.top - r.height / 2) * 0.35);
-      }}
-      onPointerLeave={() => {
-        x.set(0);
-        y.set(0);
-      }}
-    >
-      {children}
-    </motion.span>
   );
 }
 
